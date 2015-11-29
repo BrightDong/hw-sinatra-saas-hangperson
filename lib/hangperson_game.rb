@@ -12,7 +12,10 @@ class HangpersonGame
     @word = word
     @guesses =''
     @wrong_guesses =''
-    @word_remain = word
+    @word_remain = word + ''  # guess a bug of ruby
+    @word_with_guesses ='-' * word.length
+    @check_win_or_lose = :play
+    @max_guess = 7
   end
 
   def self.get_random_word
@@ -22,7 +25,7 @@ class HangpersonGame
     Net::HTTP.post_form(uri ,{}).body
   end
 
-  attr_accessor :word, :guesses, :wrong_guesses
+  attr_accessor :word, :guesses, :wrong_guesses, :word_with_guesses, :check_win_or_lose
 
   def guess(c) 
       raise ArgumentError, "input is nil or empty" if c == nil || c == ''
@@ -36,10 +39,17 @@ class HangpersonGame
       #correct guess
       if (@word_remain.delete!(c) != nil)
           @guesses += c 
+          #guesses_split = @guesses.split('')
+          word_remain_split = @word_remain.split('')
+          word_tmp = @word
+          word_remain_split.each{|x| word_tmp = word_tmp.sub(x,'-')}
+          @word_with_guesses = word_tmp 
+          @check_win_or_lose = :win if @word_remain == ''
       else
       #wrong guess
           if @wrong_guesses.index(c) == nil
               @wrong_guesses += c
+              @check_win_or_lose = :lose if @wrong_guesses.length == @max_guess
           end
       end
       return true
